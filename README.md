@@ -55,3 +55,12 @@
     
     # 使用selenium登录并运行
     python2 pet_chain.py login
+
+
+>
+
+### 最后
+
+欢迎加微信一起讨论
+
+![]("https://github.com/yanwii/pet-chain/wechat/webwxgetmsgimg.jpeg")
