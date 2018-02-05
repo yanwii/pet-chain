@@ -4,7 +4,12 @@ import time
 import thread
 import threadpool
 import json
+import sys
 import ConfigParser
+try:
+    from selenium import webdriver
+except ImportError,e:
+    webdriver_model = None
 
 
 class PetChain():
@@ -20,6 +25,10 @@ class PetChain():
         }
         self.degree_conf = {}
         self.interval = 1
+
+        self.cookies = ''
+        self.username = ''
+        self.password = ''
         self.headers = {}
         self.get_headers()
         self.get_config()
@@ -37,6 +46,8 @@ class PetChain():
 
         self.interval = config.getfloat("Pet-Chain", "interval")
 
+        self.username = config.get("Login", "username")
+        self.password = config.get("Login", "password")
 
     def get_headers(self):
         with open("data/headers.txt") as f:
@@ -91,6 +102,47 @@ class PetChain():
         except Exception,e:
             pass
 
+    def login(self):
+        assert self.username and self.password, ValueError("请在配置文件中配置用户名和密码")
+        web = webdriver.Chrome()
+        web.get("https://wappass.baidu.com/passport/login?adapter=3&u=https%3A%2F%2Fpet-chain.baidu.com%2Fchain%2Fpersonal%3Ft%3D1517824991316")
+        
+        username_el = web.find_element_by_name("username")
+        username_el.send_keys(self.username)
+
+        password_el = web.find_element_by_name("password")
+        password_el.send_keys(self.password)
+
+        
+        if_yzm = web.find_element_by_id("login-verifyWrapper").value_of_css_property("display")
+        if if_yzm != "none":
+            yzm = raw_input("请输入验证码: ")
+            web.find_element_by_name("verifycode").send_keys(yzm)
+
+        web.find_element_by_id("login-submit").click()
+        time.sleep(5)
+        cookies = web.get_cookies()
+        self.format_cookie(cookies)
+        web.quit()
+        self.run()
+
+    def format_cookie(self, cookies):
+        self.cookies = ''
+        for cookie in cookies:
+            self.cookies += cookie.get(u"name") + u"=" + cookie.get(u"value") + ";"
+        self.headers = {
+            'Accept':'application/json',
+            'Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'en-US,en;q=0.9',
+            'Connection':'keep-alive',
+            'Content-Type':'application/json',
+            'Cookie':self.cookies,
+            'Host':'pet-chain.baidu.com',
+            'Origin':'https://pet-chain.baidu.com',
+            'Referer':'https://pet-chain.baidu.com/chain/dogMarket?t=1517829948427',
+            'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36',
+        }
+
     def run(self):
         while True:
             pc.get_market()
@@ -98,4 +150,7 @@ class PetChain():
 
 if __name__ == "__main__":
     pc = PetChain()
-    pc.run()
+    if sys.argv[1] == "run":
+        pc.run()
+    elif sys.argv[1] == "login":
+        pc.login()
