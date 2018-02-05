@@ -4,25 +4,39 @@ import time
 import thread
 import threadpool
 import json
+import ConfigParser
+
+
 class PetChain():
-    def __init__(self, 
-                 interval=0.5,       
-                 common=5,         
-                 rare=10,          
-                 excellence=20,    
-                 epic=30,          
-                 mythical=40           
-                 ):
-        self.degree_conf = {
-            0:common,
-            1:rare,
-            2:excellence,
-            3:epic,
-            4:mythical,
+    def __init__(self):
+
+
+        self.degree_map = {
+            0:"common",
+            1:"rare",
+            2:"excellence",
+            3:"epic",
+            4:"mythical",
         }
-        self.interval = interval
+        self.degree_conf = {}
+        self.interval = 1
         self.headers = {}
         self.get_headers()
+        self.get_config()
+
+    def get_config(self):
+        config = ConfigParser.ConfigParser()
+        config.read("config.ini")
+
+        for i in range(5):
+            try:
+                amount = config.getfloat("Pet-Chain", self.degree_map.get(i))
+            except Exception,e:
+                amount = 100
+            self.degree_conf[i] = amount
+
+        self.interval = config.getfloat("Pet-Chain", "interval")
+
 
     def get_headers(self):
         with open("data/headers.txt") as f:
