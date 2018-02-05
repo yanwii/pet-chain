@@ -36,7 +36,7 @@
 ### 用法
 
     # 直接运行
-    python2 pet_chain.py
+    python2 pet_chain.py run
     
     # 使用selenium登录并运行
     python2 pet_chain.py login

@@ -14,8 +14,6 @@ except ImportError,e:
 
 class PetChain():
     def __init__(self):
-
-
         self.degree_map = {
             0:"common",
             1:"rare",
@@ -88,17 +86,19 @@ class PetChain():
     def purchase(self, pet):
         try:
             pet_id = pet.get(u"petId")
+            pet_amount = pet.get(u"amount")
+            pet_degree = pet.get(u"rareDegree")
             data = {
                 "appId":1,
                 "petId":pet_id,
                 "requestId":1517730660382,
-                "tpl":""
+                "tpl":"",
+                "amount":"{}".format(pet_amount)
             }
-            pet_amount = pet.get(u"amount")
-            pet_degree = pet.get(u"rareDegree")
+            
             if float(pet_amount) <= self.degree_conf.get(pet_degree):
                 page = requests.post("https://pet-chain.baidu.com/data/txn/create", headers=self.headers, data=json.dumps(data), timeout=2)
-                print page.json()
+                print json.dumps(page.json(),ensure_ascii=False)
         except Exception,e:
             pass
 
