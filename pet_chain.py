@@ -154,3 +154,5 @@ if __name__ == "__main__":
         pc.run()
     elif sys.argv[1] == "login":
         pc.login()
+    else:
+        pc.run()

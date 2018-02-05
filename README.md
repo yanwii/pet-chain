@@ -10,12 +10,8 @@
 
     pip2 install -U selenium
 
-
-1.如果不使用selenium，则需要保存headers  
-打开[莱茨狗市场页面](https://pet-chain.baidu.com/chain/dogMarket?t=1517819157016)，登录  
-打开浏览器调试模式，点击价格排序，并将*queryPetsOnSale*请求的headers复制到*data/headers.txt*中  
-
-2.编辑config.ini  
+1.编辑config.ini  
+    
     [Pet-Chain]
     interval    程序间隔
     common      普通品质价格
@@ -28,6 +24,12 @@
     [Login]
     username    百度用户名
     password    百度密码  
+
+2.如果不使用selenium，则需要保存headers  
+打开[莱茨狗市场页面](https://pet-chain.baidu.com/chain/dogMarket?t=1517819157016)，登录  
+打开浏览器调试模式，点击价格排序，并将*queryPetsOnSale*请求的headers复制到*data/headers.txt*中  
+
+
 
 只有实时价格小于设置的价格，才会尝试购买  
 
