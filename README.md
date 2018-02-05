@@ -2,12 +2,16 @@
 
 之前版本程序有点问题，现已修复，可以抢单，请注意设置金额。
 
+>
+
 ### 领养
-一共可以领养四只狗
-[第一只](https://pet-chain.baidu.com/chain/splash)
-[第二只](https://pet-chain.baidu.com/chain/splash?appId=2&tpl=wallet)
-[第三只](https://pet-chain.baidu.com/chain/splash?appId=3&tpl=wallet)
-[第四只](https://pet-chain.baidu.com/chain/splash?appId=4&tpl=wallet)
+一共可以领养四只狗  
+[第一只](https://pet-chain.baidu.com/chain/splash)  
+[第二只](https://pet-chain.baidu.com/chain/splash?appId=2&tpl=wallet)  
+[第三只](https://pet-chain.baidu.com/chain/splash?appId=3&tpl=wallet)  
+[第四只](https://pet-chain.baidu.com/chain/splash?appId=4&tpl=wallet)  
+
+>
 
 ### 说明
 
@@ -41,6 +45,8 @@
 
 
 只有实时价格小于设置的价格，才会尝试购买  
+
+>
 
 ### 用法
 
