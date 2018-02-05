@@ -63,4 +63,4 @@
 
 欢迎加微信一起讨论
 
-![]("https://github.com/yanwii/pet-chain/wechat/webwxgetmsgimg.jpeg")
+![]("./wechat/webwxgetmsgimg.png")
