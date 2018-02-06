@@ -126,6 +126,24 @@ class PetChain():
         web.quit()
         self.run()
 
+    def get_captcha(self):
+        seed = -1
+        img = ''
+        try:
+            data = {
+                "requestId":1517881529697,
+                "appId":1,
+                "tpl":""
+            }
+            page = requests.post("https://pet-chain.baidu.com/data/captcha/gen", data=json.dumps(data), headers=self.headers)
+            resp = page.json()
+            if resp.get(u"errorMsg") == u"success":
+                seed = resp.get(u"data").get(u"seed")
+                img = resp.get(u"data").get(u"img")
+        except Exception,e:
+            print e
+        return seed,img
+
     def format_cookie(self, cookies):
         self.cookies = ''
         for cookie in cookies:
