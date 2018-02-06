@@ -2,15 +2,18 @@
 import requests
 import time
 import thread
-import threadpool
 import json
 import sys
 import ConfigParser
+from PIL import Image,ImageFile
+import base64
+import os
 try:
     from selenium import webdriver
 except ImportError,e:
     webdriver_model = None
 
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 class PetChain():
     def __init__(self):
@@ -75,12 +78,10 @@ class PetChain():
                 print "[->] purchase"
                 pets = page.json().get(u"data").get("petsOnSale")
 
-                pool = threadpool.ThreadPool(10)
-                req = threadpool.makeRequests(self.purchase, pets)
-                for queue in req:
-                    pool.putRequest(queue)
-                pool.wait()
+                for pet in pets:
+                    self.purchase(pet)
         except Exception,e:
+            print e
             pass
 
     def purchase(self, pet):
@@ -88,18 +89,31 @@ class PetChain():
             pet_id = pet.get(u"petId")
             pet_amount = pet.get(u"amount")
             pet_degree = pet.get(u"rareDegree")
+            pet_validCode = pet.get(u"validCode")
+
             data = {
                 "appId":1,
                 "petId":pet_id,
-                "requestId":1517730660382,
+                "captcha": "",
+                "seed": 0,
+                "requestId": int(time.time() * 1000),
                 "tpl":"",
-                "amount":"{}".format(pet_amount)
+                "amount":"{}".format(pet_amount),
+                "validCode": pet_validCode
             }
-            
+            #print "Match pet degree:{} amount:{}".format(pet_degree, pet_amount)
             if float(pet_amount) <= self.degree_conf.get(pet_degree):
+                captcha, seed = self.get_captcha()
+                assert captcha and seed, ValueError("验证码为空")
+                data['captcha'] = captcha
+                data['seed'] = seed
                 page = requests.post("https://pet-chain.baidu.com/data/txn/create", headers=self.headers, data=json.dumps(data), timeout=2)
-                print json.dumps(page.json(),ensure_ascii=False)
+                resp = page.json()
+                if resp.get(u"errorMsg") != u"验证码错误":
+                    os.rename("data/captcha.jpg", "data/captcha_dataset/{}.jpg".format(captcha))
+                print json.dumps(resp, ensure_ascii=False)
         except Exception,e:
+            print e
             pass
 
     def login(self):
@@ -128,10 +142,10 @@ class PetChain():
 
     def get_captcha(self):
         seed = -1
-        img = ''
+        captcha = -1
         try:
             data = {
-                "requestId":1517881529697,
+                "requestId":int(time.time() * 1000),
                 "appId":1,
                 "tpl":""
             }
@@ -140,9 +154,16 @@ class PetChain():
             if resp.get(u"errorMsg") == u"success":
                 seed = resp.get(u"data").get(u"seed")
                 img = resp.get(u"data").get(u"img")
+                with open('data/captcha.jpg', 'wb') as fp:
+                    fp.write(base64.b64decode(img))
+                    fp.close()
+                im = Image.open("data/captcha.jpg")
+                im.show()
+                captcha = raw_input("enter captcha:")
+                im.close()
         except Exception,e:
             print e
-        return seed,img
+        return captcha, seed
 
     def format_cookie(self, cookies):
         self.cookies = ''
@@ -160,6 +181,10 @@ class PetChain():
             'Referer':'https://pet-chain.baidu.com/chain/dogMarket?t=1517829948427',
             'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36',
         }
+
+        with open("data/headers.txt", "w") as f:
+            for key,value in self.headers.items():
+                f.write("{}:{}\n".format(key, value))
 
     def run(self):
         while True:

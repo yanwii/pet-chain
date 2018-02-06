@@ -1,7 +1,6 @@
 ### 百度莱茨狗购买脚本
 
-NOTICE！！！！！
-百度加入了验证码机制，等待后续更新
+手撸验证码！
 
 >
 
@@ -16,11 +15,11 @@ NOTICE！！！！！
 
 ### 说明
 
-使用前请安装threadpool
+使用前请安装pillow
 
-    pip2 install threadpool
+    pip2 install pillow
 
-如果想使用*selenium*自动登录，需要安装
+如果想使用*selenium*自动登录，需要安装(暂时不可用)  
 
     pip2 install -U selenium
 
@@ -59,14 +58,8 @@ NOTICE！！！！！
 
 
 >
-
-### Update
-
-- 2018-02-06 添加验证码获取方法
-
->
 ### 最后
 
 欢迎加入微信群一起讨论  
 
-![](./wechat/1908357380.jpg)
+![](./wechat/webwxgetmsgimg.png)
