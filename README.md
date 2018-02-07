@@ -9,6 +9,13 @@
 
 >
 
+### web版本效果
+
+![](wechat/byzanz-demo.gif)
+
+
+>
+
 ### 领养
 一共可以领养四只狗  
 [第一只](https://pet-chain.baidu.com/chain/splash)  
@@ -60,7 +67,6 @@
 
 >
 ### 最后
-
 
 
 欢迎加入微信群、QQ群一起讨论  
