@@ -1,0 +1,66 @@
+.content {
+    margin-left: 30%;
+    margin-right: 30%;
+    top: 200px;
+    position:  relative;
+}
+.head {
+    min-height: 80px;
+}
+
+.dog-detail {
+    height: 164px;
+    margin-bottom: 40px;
+}
+.dog-img {width: 200px;height: 160px;}
+
+.captcha {top: 20px;position: relative;}
+.dog-amount {
+
+}
+.dog-degree {margin-left: 30px;}
+.captcha-input {
+
+}
+.captcha-submit {
+    
+}
+.captcha-img {
+    width: 200px;
+    height: 70px;
+    position: relative;
+    /* left: 200px; */
+    margin-bottom: 10px;
+    /* float: left; */
+}
+.dog-img-container {
+    display: inline;
+    height: 164px;
+    width: 200px;
+    /* margin-right: 0px; */
+    /* box-sizing: border-box; */
+    float: left;
+}
+.dog-info-container {
+    height: 164px;
+    position: relative;
+    /* display: inline; */
+    float: left;
+}
+.dog-properties {
+    /* left: 200px; */
+    top: 20px;
+    position: relative;
+    text-align: left;
+    margin-bottom:  10px;
+}
+.dog {
+    height: 164px;
+}   
+
+.msg {
+    width: 100%;
+    position: relative;
+    top:160px;
+    text-align: center;
+}

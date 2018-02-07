@@ -2,6 +2,11 @@
 
 手撸验证码！
 
+什么 tesseract-ocr 暴力破解就算了吧
+
+加入Web版本！！！！
+自动加载，自动获得焦点。
+
 >
 
 ### 领养
@@ -16,7 +21,7 @@
 ### 说明
 
 使用前请安装pillow
-
+    pip2 install flask
     pip2 install pillow
 
 如果想使用*selenium*自动登录，需要安装(暂时不可用)  
@@ -53,9 +58,8 @@
     # 直接运行
     python2 pet_chain.py run
     
-    # 使用selenium登录并运行
-    python2 pet_chain.py login
-
+    # 网页版 
+    python2 web.py
 
 >
 ### 最后

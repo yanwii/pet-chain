@@ -60,7 +60,8 @@ class PetChain():
                 value = ":".join(splited[1:]).strip()
                 self.headers[key] = value
 
-    def get_market(self):
+    def get_market(self, model="ter"):
+        pets = []
         try:
             data = {
                 "appId":1,
@@ -77,12 +78,13 @@ class PetChain():
             if page.json().get(u"errorMsg") == u"success":
                 print "[->] purchase"
                 pets = page.json().get(u"data").get("petsOnSale")
-
-                for pet in pets:
-                    self.purchase(pet)
+                if model == "ter":
+                    for pet in pets:
+                        self.purchase(pet)
         except Exception,e:
             print e
-            pass
+            pets = []
+        return pets
 
     def purchase(self, pet):
         try:
@@ -145,7 +147,7 @@ class PetChain():
         captcha = -1
         try:
             data = {
-                "requestId":int(time.time() * 1000),
+                "requestId":1518007015081,
                 "appId":1,
                 "tpl":""
             }
