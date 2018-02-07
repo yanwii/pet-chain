@@ -195,9 +195,4 @@ class PetChain():
 
 if __name__ == "__main__":
     pc = PetChain()
-    if sys.argv[1] == "run":
-        pc.run()
-    elif sys.argv[1] == "login":
-        pc.login()
-    else:
-        pc.run()
+    pc.run()
