@@ -16,6 +16,13 @@
 
 >
 
+### 群体智慧
+
+正常情况下data/captcha_dataset里会有一些已经打好标签的二维码，   
+如果您愿意贡献出来，请发送到yanwii@outlook.com邮箱，为验证码识别出一份力，感谢！
+
+>
+
 ### 领养
 一共可以领养四只狗  
 [第一只](https://pet-chain.baidu.com/chain/splash)  
