@@ -27,7 +27,8 @@
 
 ### 说明
 
-使用前请安装pillow
+使用前请安装pillow,flask
+    
     pip2 install flask
     pip2 install pillow
 
@@ -64,7 +65,7 @@
     
     # 网页版 
     python2 web.py
-
+    在浏览器中打开： http://127.0.0.1:5000/ 
 >
 ### 最后
 
