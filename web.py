@@ -5,6 +5,7 @@ import time
 import ConfigParser
 from PIL import Image
 import requests
+import os
 import json
 import base64
 
@@ -116,9 +117,13 @@ def purchase():
                     "validCode": pet_validCode.encode("utf-8")
                 }
             print data
+            headers['Referer'] = u"https://pet-chain.baidu.com/chain/detail?channel=market&petId={}&appId=1&validCode={}".format(did, pet_validCode)
+
             page = requests.post("https://pet-chain.baidu.com/data/txn/create", headers=headers, data=json.dumps(data), timeout=2)
             resp = page.json()
             r['msg'] = resp.get(u"errorMsg")
+            if r['msg'] != u"验证码错误":
+                os.rename("data/captcha.jpg", "data/captcha_dataset/{}.jpg".format(captcha))
     except Exception,e:
         r['msg'] = str(e)
     return jsonify(r)
@@ -137,6 +142,9 @@ def get_captcha():
         if resp.get(u"errorMsg") == u"success":
             seed = resp.get(u"data").get(u"seed")
             img = resp.get(u"data").get(u"img")
+            with open('data/captcha.jpg', 'wb') as fp:
+                    fp.write(base64.b64decode(img))
+                    fp.close()
             r = {
                 "code":200,
                 "img":img,
