@@ -10,8 +10,10 @@ function refresh(params) {
         url:"/getMarket",
         success: function(data) {
             $(".dogs").html(data['html']);
-            $("input[name='captcha-input']").first().focus();
-            get_captcha();
+            if($(".dog-detail").length > 0){
+                $("input[name='captcha-input']").first().focus();
+                get_captcha()
+            }
         }
     })
 }
@@ -32,7 +34,7 @@ function get_captcha() {
     })
 }
 
-function bind_(params) {
+function bind_() {
     var bind_input = $(".captcha-input").first();
     bind_input.bind('input propertychage', function() {
         console.log(bind_input.val());
@@ -70,8 +72,14 @@ function purchase(id, captcha) {
     get_captcha();
 }
 
+function check() {
+    if($(".dog-detail").length == 0){
+        window.location.reload();
+    }
+}
 
 $(window).ready(function() {
     // focus
-    refresh()
+    refresh();
+    setTimeout(check, 2000);
 })
