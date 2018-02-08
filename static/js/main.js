@@ -9,7 +9,7 @@ function refresh(params) {
         type:"GET",
         url:"/getMarket",
         success: function(data) {
-            $(".dogs").append(data['html']);
+            $(".dogs").html(data['html']);
             $("input[name='captcha-input']").first().focus();
             get_captcha();
         }

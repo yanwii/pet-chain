@@ -90,7 +90,9 @@ def get_market():
                          amount,
                          degree,
                      )
+        html = "没有满足条件的狗" if not html else html
     except Exception,e:
+        html = str(e)
         print e
     return jsonify({"html":html})
 
