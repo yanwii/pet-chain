@@ -1,8 +1,14 @@
 # -*- coding:utf-8 -*-
 
+import sys
+version = sys.version
+
 from flask import Flask, request, render_template,jsonify
 import time
-import ConfigParser
+if "2.7" in  version:
+    import ConfigParser
+else:
+    import configparser as ConfigParser
 from PIL import Image
 import requests
 import os
@@ -91,9 +97,9 @@ def get_market():
                          degree,
                      )
         html = "没有满足条件的狗" if not html else html
-    except Exception,e:
+    except Exception as e:
         html = str(e)
-        print e
+        print(e)
     return jsonify({"html":html})
 
 @app.route("/purchase")
@@ -118,7 +124,6 @@ def purchase():
                     "amount":"{}".format(pet_amount),
                     "validCode": pet_validCode.encode("utf-8")
                 }
-            print data
             headers['Referer'] = u"https://pet-chain.baidu.com/chain/detail?channel=market&petId={}&appId=1&validCode={}".format(did, pet_validCode)
 
             page = requests.post("https://pet-chain.baidu.com/data/txn/create", headers=headers, data=json.dumps(data), timeout=2)
@@ -126,7 +131,7 @@ def purchase():
             r['msg'] = resp.get(u"errorMsg")
             if r['msg'] != u"验证码错误":
                 os.rename("data/captcha.jpg", "data/captcha_dataset/{}.jpg".format(captcha))
-    except Exception,e:
+    except Exception as e:
         r['msg'] = str(e)
     return jsonify(r)
 
@@ -152,7 +157,7 @@ def get_captcha():
                 "img":img,
                 "seed":seed
             }
-    except Exception,e:
+    except Exception as e:
         pass
     return jsonify(r)
 
@@ -175,7 +180,7 @@ def get_config():
     for i in range(5):
         try:
             amount = config.getfloat("Pet-Chain", degree_map.get(i))
-        except Exception,e:
+        except Exception as e:
             amount = 100
         degree_conf[i] = amount
 
@@ -195,9 +200,9 @@ def market():
         }
         page = requests.post("https://pet-chain.baidu.com/data/market/queryPetsOnSale", headers=headers, data=json.dumps(data))
         if page.json().get(u"errorMsg") == u"success":
-            print "[->] purchase"
+            print("[->] purchase")
             pets = page.json().get(u"data").get("petsOnSale")
-    except Exception,e:
+    except Exception as e:
         pass
     return pets
 
