@@ -1,11 +1,7 @@
 ### 百度莱茨狗购买脚本
 
-手撸验证码！
+支持属性选择，初始金额，初始等级，稀有数
 
-什么 tesseract-ocr 暴力破解就算了吧
-
-加入Web版本！！！！
-自动加载，自动获得焦点。
 
 >
 
@@ -16,19 +12,22 @@
 
 >
 
-### 群体智慧
+### 配置
+配置根目录下config.json
 
-正常情况下data/captcha_dataset里会有一些已经打好标签的二维码，   
-如果您愿意贡献出来，请发送到yanwii@outlook.com邮箱，为验证码识别出一份力，感谢！
-
->
-
-### 领养
-一共可以领养四只狗  
-[第一只](https://pet-chain.baidu.com/chain/splash)  
-[第二只](https://pet-chain.baidu.com/chain/splash?appId=2&tpl=wallet)  
-[第三只](https://pet-chain.baidu.com/chain/splash?appId=3&tpl=wallet)  
-[第四只](https://pet-chain.baidu.com/chain/splash?appId=4&tpl=wallet)  
+    num_of_rare_attr    稀有属性个数
+    max_num_of_pages    最大页数
+    body                体型
+    eyes                眼睛
+    mouth               嘴巴
+    pattern             花纹
+    color_of_body       体型颜色
+    color_of_eyes       眼睛颜色
+    color_of_pattern    花纹颜色
+    color_of_belly      肚皮颜色
+    sort_by             按照rare/price排序
+    initial_degree      初始等级
+    initial_amount      初始金额
 
 >
 
