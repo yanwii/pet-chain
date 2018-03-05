@@ -2,7 +2,6 @@
 
 import sys
 version = sys.version
-
 from flask import Flask, request, render_template,jsonify
 import time
 if "2.7" in  version:
@@ -116,16 +115,17 @@ def purchase():
 
             data = {
                     "appId":1,
-                    "petId":did,
-                    "captcha": captcha,
-                    "seed": seed,
+                    "petId":did.encode("utf-8"),
+                    "captcha": captcha.encode("utf-8"),
+                    "seed": seed.encode("utf-8"),
                     "requestId": 1518007015081,
                     "tpl":"",
                     "amount":"{}".format(pet_amount),
                     "validCode": pet_validCode.encode("utf-8")
-                }
+            }
+            print data
             headers['Referer'] = u"https://pet-chain.baidu.com/chain/detail?channel=market&petId={}&appId=1&validCode={}".format(did, pet_validCode)
-
+            print headers
             page = requests.post("https://pet-chain.baidu.com/data/txn/create", headers=headers, data=json.dumps(data), timeout=2)
             resp = page.json()
             r['msg'] = resp.get(u"errorMsg")

@@ -8,10 +8,6 @@ import ConfigParser
 from PIL import Image,ImageFile
 import base64
 import os
-try:
-    from selenium import webdriver
-except ImportError,e:
-    webdriver_model = None
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -20,35 +16,64 @@ class PetChain():
         self.degree_map = {
             0:"common",
             1:"rare",
-            2:"excellence",
+            2:"excellence", 
             3:"epic",
             4:"mythical",
+            5:"legend"
         }
         self.degree_conf = {}
         self.interval = 1
 
         self.cookies = ''
-        self.username = ''
-        self.password = ''
         self.headers = {}
         self.get_headers()
         self.get_config()
 
     def get_config(self):
-        config = ConfigParser.ConfigParser()
-        config.read("config.ini")
+        f = open("config.json")
+        config = json.load(f)
+        f.close()
 
-        for i in range(5):
+        self.interval = config.get("interval")
+        for i in range(6):
             try:
-                amount = config.getfloat("Pet-Chain", self.degree_map.get(i))
+                price = config.get(self.degree_map.get(i))
             except Exception,e:
-                amount = 100
-            self.degree_conf[i] = amount
+                price = 100
+            self.degree_conf[i] = price
 
-        self.interval = config.getfloat("Pet-Chain", "interval")
+        # 稀有数量
+        self.num_of_rare_attr = config.get("num_of_rare_attr")
 
-        self.username = config.get("Login", "username")
-        self.password = config.get("Login", "password")
+        # 最大页数
+        self.max_num_of_pages = config.get("max_num_of_pages")
+        # 初始金额
+        self.initial_amount = config.get("initial_amount")
+        # 初始等级
+        self.initial_degree = config.get("initial_degree")
+        # 排序
+        sort_map = {
+            "rare":"RAREDEGREE_DESC",
+            "price":"AMOUNT_ASC"
+        }
+        sort_by = config.get("sort_by")
+        self.sort_type = sort_map.get(sort_by, "RAREDEGREE_DESC")
+
+        # 稀有类型
+        self.attrs = {
+            u"体型":"body",
+            u"眼睛":"eyes",
+            u"嘴巴":"mouth",
+            u"花纹":"pattern",
+            u"身体色":"color_of_body",
+            u"眼睛色":"color_of_eyes",
+            u"花纹色":"color_of_pattern",
+            u"肚皮色":"color_of_belly"
+        }
+        self.attr_map = {}
+        for attr in self.attrs.values():
+            if config.get(attr):
+                self.attr_map[attr] = config.get(attr)
 
     def get_headers(self):
         with open("data/headers.txt") as f:
@@ -60,23 +85,22 @@ class PetChain():
                 value = ":".join(splited[1:]).strip()
                 self.headers[key] = value
 
-    def get_market(self, model="ter"):
+    def get_market(self, pageno, model="ter"):
         pets = []
         try:
             data = {
-                "appId":1,
-                "lastAmount":1,
-                "lastRareDegree":0,
-                "pageNo":1,
-                "pageSize":20,
+                "pageNo":pageno,
+                "pageSize":10,
+                "querySortType":self.sort_type,
                 "petIds":[],
-                "querySortType":"AMOUNT_ASC",
-                "requestId":1517730660382,
+                "lastAmount":self.initial_amount,
+                "lastRareDegree":self.initial_degree,
+                "requestId":1520289278968,
+                "appId":1,
                 "tpl":"",
             }
-            page = requests.post("https://pet-chain.baidu.com/data/market/queryPetsOnSale", headers=self.headers, data=json.dumps(data))
+            page = requests.post("https://pet-chain.baidu.com/data/market/queryPetsOnSale", headers=self.headers, data=json.dumps(data), timeout=2)
             if page.json().get(u"errorMsg") == u"success":
-                print "[->] purchase"
                 pets = page.json().get(u"data").get("petsOnSale")
                 if model == "ter":
                     for pet in pets:
@@ -103,45 +127,63 @@ class PetChain():
                 "amount":"{}".format(pet_amount),
                 "validCode": pet_validCode
             }
+            pet_attrs = self.get_attrs(pet_id)
+
+            assert self.is_qualified(pet_attrs, pet_amount, pet_degree), ValueError("pet:%s 不符合条件" % pet_id.encode("utf-8"))
             #print "Match pet degree:{} amount:{}".format(pet_degree, pet_amount)
-            if float(pet_amount) <= self.degree_conf.get(pet_degree):
-                captcha, seed = self.get_captcha()
-                assert captcha and seed, ValueError("验证码为空")
-                data['captcha'] = captcha
-                data['seed'] = seed
-                self.headers['Referer'] = "https://pet-chain.baidu.com/chain/detail?channel=market&petId={}&appId=1&validCode={}".format(pet_id, pet_validCode)
-                page = requests.post("https://pet-chain.baidu.com/data/txn/create", headers=self.headers, data=json.dumps(data), timeout=2)
-                resp = page.json()
-                if resp.get(u"errorMsg") != u"验证码错误":
-                    os.rename("data/captcha.jpg", "data/captcha_dataset/{}.jpg".format(captcha))
-                print json.dumps(resp, ensure_ascii=False)
+            captcha, seed = self.get_captcha()
+            assert captcha and seed, ValueError("验证码为空")
+            data['captcha'] = captcha
+            data['seed'] = seed
+            page = requests.post("https://pet-chain.baidu.com/data/txn/create", headers=self.headers, data=json.dumps(data), timeout=2)
+            resp = page.json()
+            print json.dumps(resp, ensure_ascii=False)
         except Exception,e:
             print e
             pass
 
-    def login(self):
-        assert self.username and self.password, ValueError("请在配置文件中配置用户名和密码")
-        web = webdriver.Chrome()
-        web.get("https://wappass.baidu.com/passport/login?adapter=3&u=https%3A%2F%2Fpet-chain.baidu.com%2Fchain%2Fpersonal%3Ft%3D1517824991316")
-        
-        username_el = web.find_element_by_name("username")
-        username_el.send_keys(self.username)
+    def is_qualified(self, pet_attrs, pet_amount, pet_degree):
+        nums_rare = 0
+        is_qualified = False
 
-        password_el = web.find_element_by_name("password")
-        password_el.send_keys(self.password)
+        detail = u" 特殊属性 "
+        for attr in pet_attrs:
+            name = attr.get(u"name")
+            attr_name = self.attrs.get(name)
+            rare_degree = attr.get(u"rareDegree")
+            if rare_degree == u"稀有":
+                nums_rare += 1
+            if attr_name in self.attr_map:
+                attr_value = attr.get(u"value")
+                if attr_value not in self.attr_map.get(attr_name):
+                    return False
+                else:
+                    detail += u"%s:%s " % (name, attr_value)
+        if nums_rare < self.num_of_rare_attr:
+            return False
 
-        
-        if_yzm = web.find_element_by_id("login-verifyWrapper").value_of_css_property("display")
-        if if_yzm != "none":
-            yzm = raw_input("请输入验证码: ")
-            web.find_element_by_name("verifycode").send_keys(yzm)
+        if float(pet_amount) > self.degree_conf.get(pet_degree):
+            return False
+        print u"稀有属性:%s  稀有等级:%s  价格:%s " % (nums_rare, pet_degree, pet_amount) + detail
+        return True
 
-        web.find_element_by_id("login-submit").click()
-        time.sleep(5)
-        cookies = web.get_cookies()
-        self.format_cookie(cookies)
-        web.quit()
-        self.run()
+
+    def get_attrs(self, pet_id):
+        try:
+            data = {
+                "petId":pet_id,
+                "requestId":1520286948055,
+                "appId":1,
+                "tpl":"",
+                "timeStamp":"null",
+                "nounce":"null",
+                "token":"null"
+            }
+            page = requests.post("https://pet-chain.baidu.com/data/pet/queryPetById", data=json.dumps(data), headers=self.headers, timeout=1)
+            attrs = page.json().get("data").get("attributes")
+        except Exception,e:
+            attrs = []
+        return attrs
 
     def get_captcha(self):
         seed = -1
@@ -168,31 +210,12 @@ class PetChain():
             print e
         return captcha, seed
 
-    def format_cookie(self, cookies):
-        self.cookies = ''
-        for cookie in cookies:
-            self.cookies += cookie.get(u"name") + u"=" + cookie.get(u"value") + ";"
-        self.headers = {
-            'Accept':'application/json',
-            'Accept-Encoding':'gzip, deflate, br',
-            'Accept-Language':'en-US,en;q=0.9',
-            'Connection':'keep-alive',
-            'Content-Type':'application/json',
-            'Cookie':self.cookies,
-            'Host':'pet-chain.baidu.com',
-            'Origin':'https://pet-chain.baidu.com',
-            'Referer':'https://pet-chain.baidu.com/chain/dogMarket?t=1517829948427',
-            'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36',
-        }
-
-        with open("data/headers.txt", "w") as f:
-            for key,value in self.headers.items():
-                f.write("{}:{}\n".format(key, value))
 
     def run(self):
         while True:
-            pc.get_market()
-            time.sleep(self.interval)
+            for pageno in range(1, self.max_num_of_pages):
+                pc.get_market(pageno)
+                time.sleep(self.interval)
 
 if __name__ == "__main__":
     pc = PetChain()
