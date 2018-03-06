@@ -47,14 +47,11 @@ class PetChain():
 
         # 最大页数
         self.max_num_of_pages = config.get("max_num_of_pages")
-        # 初始金额
-        self.initial_amount = config.get("initial_amount")
-        # 初始等级
-        self.initial_degree = config.get("initial_degree")
         # 排序
         sort_map = {
             "rare":"RAREDEGREE_DESC",
-            "price":"AMOUNT_ASC"
+            "price":"AMOUNT_ASC",
+            "date":"CREATETIME_DESC"
         }
         sort_by = config.get("sort_by")
         self.sort_type = sort_map.get(sort_by, "RAREDEGREE_DESC")
@@ -93,13 +90,14 @@ class PetChain():
                 "pageSize":10,
                 "querySortType":self.sort_type,
                 "petIds":[],
-                "lastAmount":self.initial_amount,
-                "lastRareDegree":self.initial_degree,
+                "lastAmount":0,
+                "lastRareDegree":"null",
                 "requestId":1520289278968,
                 "appId":1,
                 "tpl":"",
             }
             page = requests.post("https://pet-chain.baidu.com/data/market/queryPetsOnSale", headers=self.headers, data=json.dumps(data), timeout=2)
+            print json.dumps(page.json(), ensure_ascii=False)
             if page.json().get(u"errorMsg") == u"success":
                 pets = page.json().get(u"data").get("petsOnSale")
                 if model == "ter":
@@ -128,7 +126,6 @@ class PetChain():
                 "validCode": pet_validCode
             }
             pet_attrs = self.get_attrs(pet_id)
-
             assert self.is_qualified(pet_attrs, pet_amount, pet_degree), ValueError("pet:%s 不符合条件" % pet_id.encode("utf-8"))
             #print "Match pet degree:{} amount:{}".format(pet_degree, pet_amount)
             captcha, seed = self.get_captcha()

@@ -25,9 +25,7 @@
     color_of_eyes       眼睛颜色
     color_of_pattern    花纹颜色
     color_of_belly      肚皮颜色
-    sort_by             按照rare/price排序
-    initial_degree      初始等级
-    initial_amount      初始金额
+    sort_by             按照rare/price/date排序
 
 >
 
