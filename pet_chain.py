@@ -97,12 +97,13 @@ class PetChain():
                 "tpl":"",
             }
             page = requests.post("https://pet-chain.baidu.com/data/market/queryPetsOnSale", headers=self.headers, data=json.dumps(data), timeout=2)
-            print json.dumps(page.json(), ensure_ascii=False)
             if page.json().get(u"errorMsg") == u"success":
                 pets = page.json().get(u"data").get("petsOnSale")
                 if model == "ter":
                     for pet in pets:
                         self.purchase(pet)
+            else:
+                print json.dumps(page.json(), ensure_ascii=False)
         except Exception,e:
             print e
             pets = []
