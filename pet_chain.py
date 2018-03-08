@@ -38,7 +38,7 @@ class PetChain():
         for i in range(6):
             try:
                 price = config.get(self.degree_map.get(i))
-            except Exception,e:
+            except Exception as e:
                 price = 100
             self.degree_conf[i] = price
 
@@ -104,7 +104,7 @@ class PetChain():
                         self.purchase(pet)
             else:
                 print json.dumps(page.json(), ensure_ascii=False)
-        except Exception,e:
+        except Exception as e:
             print e
             pets = []
         return pets
@@ -136,8 +136,8 @@ class PetChain():
             page = requests.post("https://pet-chain.baidu.com/data/txn/create", headers=self.headers, data=json.dumps(data), timeout=2)
             resp = page.json()
             print json.dumps(resp, ensure_ascii=False)
-        except Exception,e:
-            print e
+        except Exception as e:
+            print str(e).decode("utf-8")
             pass
 
     def is_qualified(self, pet_attrs, pet_amount, pet_degree):
@@ -145,6 +145,7 @@ class PetChain():
         is_qualified = False
 
         detail = u" 特殊属性 "
+        # print json.dumps(pet_attrs, ensure_ascii=False, indent=2)
         for attr in pet_attrs:
             name = attr.get(u"name")
             attr_name = self.attrs.get(name)
@@ -153,6 +154,8 @@ class PetChain():
                 nums_rare += 1
             if attr_name in self.attr_map:
                 attr_value = attr.get(u"value")
+                if not self.attr_map.get(attr_name):
+                    continue
                 if attr_value not in self.attr_map.get(attr_name):
                     return False
                 else:
@@ -179,7 +182,7 @@ class PetChain():
             }
             page = requests.post("https://pet-chain.baidu.com/data/pet/queryPetById", data=json.dumps(data), headers=self.headers, timeout=1)
             attrs = page.json().get("data").get("attributes")
-        except Exception,e:
+        except Exception as e:
             attrs = []
         return attrs
 
@@ -204,7 +207,7 @@ class PetChain():
                 im.show()
                 captcha = raw_input("enter captcha:")
                 im.close()
-        except Exception,e:
+        except Exception as e:
             print e
         return captcha, seed
 

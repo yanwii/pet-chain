@@ -1,4 +1,4 @@
 {
     "python.linting.enabled": false,
-    "python.pythonPath": "/bin/python2"
+    "python.pythonPath": "C:\\Python27\\python.exe"
 }
